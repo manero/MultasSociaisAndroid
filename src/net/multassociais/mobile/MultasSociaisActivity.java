@@ -10,12 +10,17 @@ import java.util.logging.Logger;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
-import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
-import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.mime.HttpMultipartMode;
+import org.apache.http.entity.mime.MultipartEntity;
+import org.apache.http.entity.mime.content.FileBody;
+import org.apache.http.entity.mime.content.StringBody;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
+import org.apache.http.protocol.BasicHttpContext;
+import org.apache.http.protocol.HttpContext;
+import org.apache.http.util.EntityUtils;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -26,6 +31,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 
@@ -49,9 +55,8 @@ public class MultasSociaisActivity extends Activity {
 			ImageView thumbnailImageView = (ImageView) findViewById(R.id.thumbnail);
 			switch (requestCode) {
 			case TAKE_PICTURE_REQUEST_CODE:
-				data.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(createImageFile()));
-				thumbnailImageView.setImageBitmap((Bitmap) data.getExtras().get(
-						"data"));
+				data.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(createImageFile())); //imageFilePath defined inside createImageFile()
+				thumbnailImageView.setImageBitmap((Bitmap) data.getExtras().get("data"));
 				break;
 			case ACTIVITY_SELECT_IMAGE:
 				Uri selectedImage = data.getData();
@@ -62,6 +67,7 @@ public class MultasSociaisActivity extends Activity {
 	            String filePath = cursor.getString(columnIndex);
 	            cursor.close();
 	            thumbnailImageView.setImageBitmap(BitmapFactory.decodeFile(filePath));
+	            imageFilePath = filePath;
 			}
 		}
 	}
@@ -94,33 +100,49 @@ public class MultasSociaisActivity extends Activity {
     }
     
     public void enviaMulta(View view) {
-    	// Create a new HttpClient and Post Header
-        HttpClient httpclient = new DefaultHttpClient();
-        HttpPost httppost = new HttpPost("http://www.multassociais.net/api/new");
+        List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>(11);
+        nameValuePairs.add(new BasicNameValuePair("api_id", "908237202 "));
+        nameValuePairs.add(new BasicNameValuePair("api_secret", "14feefc9725729307649b526bd83x11"));
+        nameValuePairs.add(new BasicNameValuePair("multa_data_ocorrencia_1i", "2012"));
+        nameValuePairs.add(new BasicNameValuePair("multa_data_ocorrencia_2i", "1"));
+        nameValuePairs.add(new BasicNameValuePair("multa_data_ocorrencia_3i", "1"));
+        nameValuePairs.add(new BasicNameValuePair("multa_data_ocorrencia_4i", "00"));
+        nameValuePairs.add(new BasicNameValuePair("multa_data_ocorrencia_5i", "00"));
+        nameValuePairs.add(new BasicNameValuePair("multa_placa", "123"));
+        nameValuePairs.add(new BasicNameValuePair("multa_foto", imageFilePath));
+        nameValuePairs.add(new BasicNameValuePair("multa_video", "123"));
+        nameValuePairs.add(new BasicNameValuePair("multa_descricao", "ESTE é só um teste do app multassociais mobile para android. por favor ignore. ainda vou arrepiar um lorem ipsum aqui: " + "Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."));
+
+        doTheHttpPost(nameValuePairs);
+    }
+   
+    
+    public void doTheHttpPost(List<NameValuePair> nameValuePairs) {
+        HttpClient httpClient = new DefaultHttpClient();
+        HttpContext localContext = new BasicHttpContext();
+        HttpPost httpPost = new HttpPost("http://www.multassociais.net/");
 
         try {
-            // Add your data
-            List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>(11);
-            nameValuePairs.add(new BasicNameValuePair("api_id", "908237202 "));
-            nameValuePairs.add(new BasicNameValuePair("api_secret", "14feefc9725729307649b526bd83x11"));
-            nameValuePairs.add(new BasicNameValuePair("multa_data_ocorrencia_1i", "2012"));
-            nameValuePairs.add(new BasicNameValuePair("multa_data_ocorrencia_2i", "1"));
-            nameValuePairs.add(new BasicNameValuePair("multa_data_ocorrencia_3i", "1"));
-            nameValuePairs.add(new BasicNameValuePair("multa_data_ocorrencia_4i", "00"));
-            nameValuePairs.add(new BasicNameValuePair("multa_data_ocorrencia_5i", "00"));
-            nameValuePairs.add(new BasicNameValuePair("multa_placa", ""));
-            nameValuePairs.add(new BasicNameValuePair("multa_foto", ""));
-            nameValuePairs.add(new BasicNameValuePair("multa_video", ""));
-            nameValuePairs.add(new BasicNameValuePair("multa_descricao", "ESTE é só um teste do app multassociais mobile para android. por favor ignore. ainda vou arrepiar um lorem ipsum aqui: " + "Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."));
-            httppost.setEntity(new UrlEncodedFormEntity(nameValuePairs));
+            MultipartEntity entity = new MultipartEntity(HttpMultipartMode.BROWSER_COMPATIBLE);
 
-            // Execute HTTP Post Request
-            HttpResponse response = httpclient.execute(httppost);
+            for(int index=0; index < nameValuePairs.size(); index++) {
+                if(nameValuePairs.get(index).getName().equalsIgnoreCase("multa_foto")) {
+                    // If the key equals to "image", we use FileBody to transfer the data
+                    entity.addPart(nameValuePairs.get(index).getName(), new FileBody(new File (nameValuePairs.get(index).getValue())));
+                } else {
+                    // Normal string data
+                    entity.addPart(nameValuePairs.get(index).getName(), new StringBody(nameValuePairs.get(index).getValue()));
+                }
+            }
+
+            httpPost.setEntity(entity);
+
+            HttpResponse response = httpClient.execute(httpPost, localContext);
+            Log.i("HTTPRESPONSE", EntityUtils.toString(response.getEntity()));
+            Log.i("HTTPRESPONSE", "------");
             
-        } catch (ClientProtocolException e) {
-            // TODO Auto-generated catch block
         } catch (IOException e) {
-            // TODO Auto-generated catch block
+            e.printStackTrace();
         }
     }
 }
