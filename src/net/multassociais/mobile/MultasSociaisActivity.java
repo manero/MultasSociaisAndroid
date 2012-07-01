@@ -11,7 +11,6 @@ import java.util.logging.Logger;
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.HttpClient;
-import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.mime.HttpMultipartMode;
 import org.apache.http.entity.mime.MultipartEntity;
@@ -21,7 +20,6 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.protocol.BasicHttpContext;
 import org.apache.http.protocol.HttpContext;
-import org.apache.http.util.EntityUtils;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -32,7 +30,6 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
-import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 
@@ -117,23 +114,6 @@ public class MultasSociaisActivity extends Activity {
     	
         doTheHttpPost(nameValuePairs);
     }
-   
-    public void doTheHttpPostSEMFOTO(List<NameValuePair> nameValuePairs) {
-        HttpClient httpClient = new DefaultHttpClient();
-        HttpContext localContext = new BasicHttpContext();
-        HttpPost httpPost = new HttpPost("http://msociais-qa.herokuapp.com/api");
-
-        try {
-        	httpPost.setEntity(new UrlEncodedFormEntity(nameValuePairs));
-
-            HttpResponse response = httpClient.execute(httpPost, localContext);
-            Log.i("HTTPRESPONSE", EntityUtils.toString(response.getEntity()));
-            Log.i("HTTPRESPONSE", "------");
-            
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
     
     public void doTheHttpPost(List<NameValuePair> nameValuePairs) {
         HttpClient httpClient = new DefaultHttpClient();
@@ -155,9 +135,8 @@ public class MultasSociaisActivity extends Activity {
 
             httpPost.setEntity(entity);
 
+            //do this in a separate thread. also, add feedback after response is completed!
             HttpResponse response = httpClient.execute(httpPost, localContext);
-            Log.i("HTTPRESPONSE", EntityUtils.toString(response.getEntity()));
-            Log.i("HTTPRESPONSE", "------");
             
         } catch (IOException e) {
             e.printStackTrace();
