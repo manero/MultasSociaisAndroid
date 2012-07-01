@@ -11,6 +11,7 @@ import java.util.logging.Logger;
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.HttpClient;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.mime.HttpMultipartMode;
 import org.apache.http.entity.mime.MultipartEntity;
@@ -100,34 +101,51 @@ public class MultasSociaisActivity extends Activity {
     }
     
     public void enviaMulta(View view) {
-        List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>(11);
-        nameValuePairs.add(new BasicNameValuePair("api_id", "908237202 "));
+    	
+    	List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>(11);
+        nameValuePairs.add(new BasicNameValuePair("api_id", "908237202"));
         nameValuePairs.add(new BasicNameValuePair("api_secret", "14feefc9725729307649b526bd83x11"));
-        nameValuePairs.add(new BasicNameValuePair("multa_data_ocorrencia_1i", "2012"));
-        nameValuePairs.add(new BasicNameValuePair("multa_data_ocorrencia_2i", "1"));
-        nameValuePairs.add(new BasicNameValuePair("multa_data_ocorrencia_3i", "1"));
-        nameValuePairs.add(new BasicNameValuePair("multa_data_ocorrencia_4i", "00"));
-        nameValuePairs.add(new BasicNameValuePair("multa_data_ocorrencia_5i", "00"));
-        nameValuePairs.add(new BasicNameValuePair("multa_placa", "123"));
-        nameValuePairs.add(new BasicNameValuePair("multa_foto", imageFilePath));
-        nameValuePairs.add(new BasicNameValuePair("multa_video", "123"));
-        nameValuePairs.add(new BasicNameValuePair("multa_descricao", "ESTE é só um teste do app multassociais mobile para android. por favor ignore. ainda vou arrepiar um lorem ipsum aqui: " + "Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."));
-
+        nameValuePairs.add(new BasicNameValuePair("multa[data_ocorrencia(1i)]", "2012"));
+        nameValuePairs.add(new BasicNameValuePair("multa[data_ocorrencia(2i)]", "1"));
+        nameValuePairs.add(new BasicNameValuePair("multa[data_ocorrencia(3i)]", "1"));
+        nameValuePairs.add(new BasicNameValuePair("multa[data_ocorrencia(4i)]", "00"));
+        nameValuePairs.add(new BasicNameValuePair("multa[data_ocorrencia(5i)]", "00"));
+        nameValuePairs.add(new BasicNameValuePair("multa[placa]", "123"));
+        nameValuePairs.add(new BasicNameValuePair("multa[foto]", imageFilePath));
+        nameValuePairs.add(new BasicNameValuePair("multa[video]", "123"));
+        nameValuePairs.add(new BasicNameValuePair("multa[descricao]", "este eh soh um teste do android app. por favor ignore. sem lorem ipsum"));
+    	
         doTheHttpPost(nameValuePairs);
     }
    
+    public void doTheHttpPostSEMFOTO(List<NameValuePair> nameValuePairs) {
+        HttpClient httpClient = new DefaultHttpClient();
+        HttpContext localContext = new BasicHttpContext();
+        HttpPost httpPost = new HttpPost("http://msociais-qa.herokuapp.com/api");
+
+        try {
+        	httpPost.setEntity(new UrlEncodedFormEntity(nameValuePairs));
+
+            HttpResponse response = httpClient.execute(httpPost, localContext);
+            Log.i("HTTPRESPONSE", EntityUtils.toString(response.getEntity()));
+            Log.i("HTTPRESPONSE", "------");
+            
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
     
     public void doTheHttpPost(List<NameValuePair> nameValuePairs) {
         HttpClient httpClient = new DefaultHttpClient();
         HttpContext localContext = new BasicHttpContext();
-        HttpPost httpPost = new HttpPost("http://www.multassociais.net/");
+        HttpPost httpPost = new HttpPost("http://msociais-qa.herokuapp.com/api");
 
         try {
             MultipartEntity entity = new MultipartEntity(HttpMultipartMode.BROWSER_COMPATIBLE);
 
             for(int index=0; index < nameValuePairs.size(); index++) {
-                if(nameValuePairs.get(index).getName().equalsIgnoreCase("multa_foto")) {
-                    // If the key equals to "image", we use FileBody to transfer the data
+                if(nameValuePairs.get(index).getName().equalsIgnoreCase("multa[foto]")) {
+                    // If the key equals to "multa[foto]", we use FileBody to transfer the data
                     entity.addPart(nameValuePairs.get(index).getName(), new FileBody(new File (nameValuePairs.get(index).getValue())));
                 } else {
                     // Normal string data
