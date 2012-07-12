@@ -28,6 +28,7 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
 
@@ -105,11 +106,15 @@ public class MultasSociaisActivity extends Activity {
 
 	// TODO: catch exception
 	public void enviaMulta(View view) throws IOException {
-		//verify if there's an image to be sent
+		
+		String descricao = ((EditText) findViewById(R.id.editText3)).getText().toString();
+		//verify if there's an image and description to be sent
 		if (imageFilePath.equals("")) {
-			Toast feedback;
-			feedback = Toast.makeText(MultasSociaisActivity.this, "Selecione uma imagem ou use a câmera!", Toast.LENGTH_LONG);
-			feedback.show();
+			showToast("Selecione uma imagem ou use a câmera!");
+			return;
+		}
+		if (descricao.equals("")) {
+			showToast("Adicione uma descrição!");
 			return;
 		}
 		
@@ -132,11 +137,18 @@ public class MultasSociaisActivity extends Activity {
 		entity.addPart("multa[placa]", new StringBody("123"));
 		entity.addPart("multa[foto]", new FileBody(f));
 		entity.addPart("multa[video]", new StringBody(""));
-		entity.addPart("multa[descricao]", new StringBody("este eh soh um teste do android app. por favor ignore. sem lorem ipsum"));
+		entity.addPart("multa[descricao]", new StringBody(descricao));
 
 		WebServiceCallTask task = new WebServiceCallTask();
 		task.execute(entity);
 	}
+	
+	private void showToast(String string) {
+		Toast feedback;
+		feedback = Toast.makeText(MultasSociaisActivity.this, string, Toast.LENGTH_SHORT);
+		feedback.show();
+	}
+
 
 	private class WebServiceCallTask extends AsyncTask<MultipartEntity, Void, Integer> {
 		ProgressDialog dialog;
@@ -192,13 +204,6 @@ public class MultasSociaisActivity extends Activity {
 			}
 			dialog.dismiss();
 		}
-		
-		private void showToast(String string) {
-			Toast feedback;
-			feedback = Toast.makeText(MultasSociaisActivity.this, string, Toast.LENGTH_SHORT);
-			feedback.show();
-		}
-		
 	}
 
 }
