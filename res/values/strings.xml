@@ -1,7 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-
-    <string name="hello">Hello World, MultasSociaisActivity!</string>
-    <string name="app_name">MultasSociais</string>
-
+    <string name="app_name">Multas Sociais Mobile</string>
+	<string name="txt_top">Escolha abaixo, tire uma foto de um flagrante ou envie uma foto da galeria do seu celular:</string>
+	<string name="btn_flagra">Flagrante!</string>
+	<string name="btn_galeria">Já tenho uma foto!</string>
+	<string name="txt_descricao">Descrição da multa:</string>
+	<string name="txt_placa">Placa do veículo (opcional):</string>
+	<string name="btn_multar">Multar!</string>
 </resources>

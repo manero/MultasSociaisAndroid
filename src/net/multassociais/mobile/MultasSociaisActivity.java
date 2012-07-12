@@ -61,6 +61,7 @@ public class MultasSociaisActivity extends Activity {
 				        Intent mediaScanIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
 				        mediaScanIntent.setData(contentUri);
 				        this.sendBroadcast(mediaScanIntent);
+				        showToast("Descreva a multa!");
 					} catch (IOException e) {
 						// TODO Auto-generated catch block
 						imageFilePath = "";
@@ -79,6 +80,7 @@ public class MultasSociaisActivity extends Activity {
 				cursor.close();
 				thumbnailImageView.setImageBitmap(BitmapFactory.decodeFile(filePath));
 				imageFilePath = filePath;
+				showToast("Descreva a multa!");
 			}
 		}
 	}
@@ -107,7 +109,7 @@ public class MultasSociaisActivity extends Activity {
 	// TODO: catch exception
 	public void enviaMulta(View view) throws IOException {
 		
-		String descricao = ((EditText) findViewById(R.id.editText3)).getText().toString();
+		String descricao = ((EditText) findViewById(R.id.edt_descricao)).getText().toString();
 		//verify if there's an image and description to be sent
 		if (imageFilePath.equals("")) {
 			showToast("Selecione uma imagem ou use a câmera!");
@@ -125,6 +127,7 @@ public class MultasSociaisActivity extends Activity {
 		String day = new SimpleDateFormat("dd").format(modifiedDate);
 		String hour = new SimpleDateFormat("HH").format(modifiedDate);
 		String minute = new SimpleDateFormat("mm").format(modifiedDate);
+		String placa = ((EditText) findViewById(R.id.edt_placa)).getText().toString();
 		
 		MultipartEntity entity = new MultipartEntity(HttpMultipartMode.BROWSER_COMPATIBLE);
 		entity.addPart("api_id", new StringBody("908237202"));
@@ -134,7 +137,7 @@ public class MultasSociaisActivity extends Activity {
 		entity.addPart("multa[data_ocorrencia(3i)]", new StringBody(day));
 		entity.addPart("multa[data_ocorrencia(4i)]", new StringBody(hour));
 		entity.addPart("multa[data_ocorrencia(5i)]", new StringBody(minute));
-		entity.addPart("multa[placa]", new StringBody("123"));
+		entity.addPart("multa[placa]", new StringBody(placa));
 		entity.addPart("multa[foto]", new FileBody(f));
 		entity.addPart("multa[video]", new StringBody(""));
 		entity.addPart("multa[descricao]", new StringBody(descricao));
@@ -166,7 +169,7 @@ public class MultasSociaisActivity extends Activity {
 		protected Integer doInBackground(MultipartEntity... entity) {
 			HttpClient httpClient = new DefaultHttpClient();
 			HttpContext localContext = new BasicHttpContext();
-			HttpPost httpPost = new HttpPost("http://msociais-qa.herokuapp.com/api");
+			HttpPost httpPost = new HttpPost("http://testes.multassociais.net/api");
 
 			httpPost.setEntity(entity[0]);
 			HttpResponse response;
