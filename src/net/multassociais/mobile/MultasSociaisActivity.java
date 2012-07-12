@@ -2,16 +2,10 @@ package net.multassociais.mobile;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.logging.Logger;
 
 import org.apache.http.HttpResponse;
-import org.apache.http.NameValuePair;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpPost;
@@ -20,7 +14,6 @@ import org.apache.http.entity.mime.MultipartEntity;
 import org.apache.http.entity.mime.content.FileBody;
 import org.apache.http.entity.mime.content.StringBody;
 import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.protocol.BasicHttpContext;
 import org.apache.http.protocol.HttpContext;
 
@@ -28,7 +21,6 @@ import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.database.Cursor;
-import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -50,6 +42,7 @@ public class MultasSociaisActivity extends Activity {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main);
+		imageFilePath = "";
 	}
 
 	@Override
@@ -59,8 +52,21 @@ public class MultasSociaisActivity extends Activity {
 			ImageView thumbnailImageView = (ImageView) findViewById(R.id.thumbnail);
 			switch (requestCode) {
 			case TAKE_PICTURE_REQUEST_CODE:
-				data.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(createImageFile())); //imageFilePath defined inside createImageFile()
-				thumbnailImageView.setImageBitmap((Bitmap) data.getExtras().get("data"));
+				File f = new File(imageFilePath);
+				if (f.exists()) {
+					try {
+						Uri contentUri = Uri.fromFile(f);
+						thumbnailImageView.setImageBitmap(MediaStore.Images.Media.getBitmap(getContentResolver(), contentUri));
+				        Intent mediaScanIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
+				        mediaScanIntent.setData(contentUri);
+				        this.sendBroadcast(mediaScanIntent);
+					} catch (IOException e) {
+						// TODO Auto-generated catch block
+						imageFilePath = "";
+						thumbnailImageView.setImageBitmap(null);
+						e.printStackTrace();
+					}
+				}
 				break;
 			case ACTIVITY_SELECT_IMAGE:
 				Uri selectedImage = data.getData();
@@ -77,24 +83,18 @@ public class MultasSociaisActivity extends Activity {
 	}
 
 	private File createImageFile() {
-		try {
-			File storageDir = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES), "multassociais");
-			storageDir.mkdirs();
-			String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
-			String imageFileName = "multa_" + timeStamp;
-			File image = File.createTempFile(imageFileName, ".jpg", storageDir);
-			imageFilePath = image.getAbsolutePath();
-			return image;
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			Logger.global.warning(e.getMessage());
-			e.printStackTrace();
-			return null;
-		}
+		File storageDir = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES), "MultasSociais");
+		storageDir.mkdirs();
+		String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+		String imageFileName = "multa_" + timeStamp;
+		File image = new File(storageDir, imageFileName + ".jpg");
+		imageFilePath = image.getAbsolutePath();
+		return image;
 	}
 
 	public void bateFoto(View view) {
 		Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+		takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(createImageFile())); //imageFilePath defined inside createImageFile()
 		startActivityForResult(takePictureIntent, TAKE_PICTURE_REQUEST_CODE);
 	}
 
@@ -105,17 +105,33 @@ public class MultasSociaisActivity extends Activity {
 
 	// TODO: catch exception
 	public void enviaMulta(View view) throws IOException {
+		//verify if there's an image to be sent
+		if (imageFilePath.equals("")) {
+			Toast feedback;
+			feedback = Toast.makeText(MultasSociaisActivity.this, "Selecione uma imagem ou use a câmera!", Toast.LENGTH_LONG);
+			feedback.show();
+			return;
+		}
+		
+		File f = new File(imageFilePath);
+		Date modifiedDate = new Date(f.lastModified());
+		String year = new SimpleDateFormat("yyyy").format(modifiedDate);
+		String month = new SimpleDateFormat("MM").format(modifiedDate);
+		String day = new SimpleDateFormat("dd").format(modifiedDate);
+		String hour = new SimpleDateFormat("HH").format(modifiedDate);
+		String minute = new SimpleDateFormat("mm").format(modifiedDate);
+		
 		MultipartEntity entity = new MultipartEntity(HttpMultipartMode.BROWSER_COMPATIBLE);
 		entity.addPart("api_id", new StringBody("908237202"));
 		entity.addPart("api_secret", new StringBody("14feefc9725729307649b526bd83x11"));
-		entity.addPart("multa[data_ocorrencia(1i)]", new StringBody("2012"));
-		entity.addPart("multa[data_ocorrencia(2i)]", new StringBody("1"));
-		entity.addPart("multa[data_ocorrencia(3i)]", new StringBody("1"));
-		entity.addPart("multa[data_ocorrencia(4i)]", new StringBody("00"));
-		entity.addPart("multa[data_ocorrencia(5i)]", new StringBody("00"));
+		entity.addPart("multa[data_ocorrencia(1i)]", new StringBody(year));
+		entity.addPart("multa[data_ocorrencia(2i)]", new StringBody(month));
+		entity.addPart("multa[data_ocorrencia(3i)]", new StringBody(day));
+		entity.addPart("multa[data_ocorrencia(4i)]", new StringBody(hour));
+		entity.addPart("multa[data_ocorrencia(5i)]", new StringBody(minute));
 		entity.addPart("multa[placa]", new StringBody("123"));
-		entity.addPart("multa[foto]", new FileBody(new File(imageFilePath)));
-		entity.addPart("multa[video]", new StringBody("123"));
+		entity.addPart("multa[foto]", new FileBody(f));
+		entity.addPart("multa[video]", new StringBody(""));
 		entity.addPart("multa[descricao]", new StringBody("este eh soh um teste do android app. por favor ignore. sem lorem ipsum"));
 
 		WebServiceCallTask task = new WebServiceCallTask();
