@@ -1,6 +1,8 @@
 package net.multassociais.mobile;
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -21,7 +23,9 @@ import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.database.Cursor;
+import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.BitmapFactory.Options;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -56,8 +60,10 @@ public class MultasSociaisActivity extends Activity {
 				File f = new File(imageFilePath);
 				if (f.exists()) {
 					try {
+						reduzEComprimeBitmap(f);
 						Uri contentUri = Uri.fromFile(f);
-						thumbnailImageView.setImageBitmap(MediaStore.Images.Media.getBitmap(getContentResolver(), contentUri));
+						Bitmap bm = MediaStore.Images.Media.getBitmap(getContentResolver(), contentUri);
+						thumbnailImageView.setImageBitmap(bm);
 				        Intent mediaScanIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
 				        mediaScanIntent.setData(contentUri);
 				        this.sendBroadcast(mediaScanIntent);
@@ -85,7 +91,7 @@ public class MultasSociaisActivity extends Activity {
 		}
 	}
 
-	private File createImageFile() {
+	private File criaArquivoDeImagem() {
 		File storageDir = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES), "MultasSociais");
 		storageDir.mkdirs();
 		String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
@@ -97,7 +103,7 @@ public class MultasSociaisActivity extends Activity {
 
 	public void bateFoto(View view) {
 		Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-		takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(createImageFile())); //imageFilePath defined inside createImageFile()
+		takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(criaArquivoDeImagem())); //imageFilePath defined inside createImageFile()
 		startActivityForResult(takePictureIntent, TAKE_PICTURE_REQUEST_CODE);
 	}
 
@@ -109,8 +115,8 @@ public class MultasSociaisActivity extends Activity {
 	// TODO: catch exception
 	public void enviaMulta(View view) throws IOException {
 		
-		String descricao = ((EditText) findViewById(R.id.edt_descricao)).getText().toString();
 		//verify if there's an image and description to be sent
+		String descricao = ((EditText) findViewById(R.id.edt_descricao)).getText().toString();
 		if (imageFilePath.equals("")) {
 			showToast("Selecione uma imagem ou use a câmera!");
 			return;
@@ -152,6 +158,21 @@ public class MultasSociaisActivity extends Activity {
 		feedback.show();
 	}
 
+	private void reduzEComprimeBitmap(File imageFile) throws FileNotFoundException, IOException {
+		Uri contentUri = Uri.fromFile(imageFile);
+		Bitmap bm = MediaStore.Images.Media.getBitmap(getContentResolver(), contentUri);
+		Options opt = new Options();
+		opt.inPurgeable = true;
+		opt.inScaled = true;
+		if (bm.getWidth() > 2048 || bm.getHeight() > 2048) {
+			opt.inSampleSize = 4;
+		} else if (bm.getWidth() > 1024 || bm.getHeight() > 1024) {
+			opt.inSampleSize = 2;
+		}
+		Bitmap result = BitmapFactory.decodeFile(imageFile.getAbsolutePath(), opt);
+		FileOutputStream newFile = new FileOutputStream(imageFile);
+		result.compress(Bitmap.CompressFormat.JPEG, 85, newFile);
+	}
 
 	private class WebServiceCallTask extends AsyncTask<MultipartEntity, Void, Integer> {
 		ProgressDialog dialog;
