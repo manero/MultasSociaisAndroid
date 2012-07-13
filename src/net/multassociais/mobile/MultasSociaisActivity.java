@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -152,10 +153,10 @@ public class MultasSociaisActivity extends Activity {
 		entity.addPart("multa[data_ocorrencia(3i)]", new StringBody(day));
 		entity.addPart("multa[data_ocorrencia(4i)]", new StringBody(hour));
 		entity.addPart("multa[data_ocorrencia(5i)]", new StringBody(minute));
-		entity.addPart("multa[placa]", new StringBody(placa));
+		entity.addPart("multa[placa]", new StringBody(placa, Charset.forName("UTF-8")));
 		entity.addPart("multa[foto]", new FileBody(f));
 		entity.addPart("multa[video]", new StringBody(""));
-		entity.addPart("multa[descricao]", new StringBody(descricao));
+		entity.addPart("multa[descricao]", new StringBody(descricao, Charset.forName("UTF-8")));
 
 		WebServiceCallTask task = new WebServiceCallTask();
 		task.execute(entity);
