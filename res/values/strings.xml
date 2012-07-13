@@ -7,4 +7,11 @@
 	<string name="txt_descricao">Descrição da multa:</string>
 	<string name="txt_placa">Placa do veículo (opcional):</string>
 	<string name="btn_multar">Multar!</string>
+	<string name="menu_sobre">Sobre o app</string>
+	<string name="txt_sobre">O Multas Sociais Mobile é o app oficial do site Multas Sociais (http://www.multassociais.net). O Multas Sociais é um site com fins estritamente educacionais e de conscientização da população. As multas sociais criadas aqui são fictícias.\n\n
+Nem o site nem o app possuem nenhum vínculo com os órgãos oficiais de controle de infrações de trânsito ou nenhum departamento governamental.\n\n
+Caso queira efetuar uma denúncia oficial, o usuário deve buscar os órgãos responsáveis em seu município ou estado.\n\n
+O Multas Sociais não se responsabiliza pelo conteúdo das informações, imagens e vídeos carregados pelos usuários da ferramenta. Caso se sinta lesado ou ofendido por qualquer informação, imagem ou vídeo disponibilizado por algum usuário do Multas Sociais, envie um e-mail para privacidade@multassociais.net para providenciarmos a remoção do conteúdo solicitado.\n\n
+Entre em contato através do e-mail contato@multassociais.net.\n\n
+Caso queira colaborar com o desenvolvimento do app, visite http://bit.ly/MultasSociaisAndroidGithub ou deixe sua opinião/sugestão clicando no botão abaixo!</string>
 </resources>

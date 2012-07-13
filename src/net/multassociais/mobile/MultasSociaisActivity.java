@@ -20,7 +20,9 @@ import org.apache.http.protocol.BasicHttpContext;
 import org.apache.http.protocol.HttpContext;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
@@ -31,9 +33,16 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
+import android.text.SpannableString;
+import android.text.method.LinkMovementMethod;
+import android.text.util.Linkify;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 public class MultasSociaisActivity extends Activity {
@@ -152,6 +161,47 @@ public class MultasSociaisActivity extends Activity {
 		task.execute(entity);
 	}
 	
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.main, menu);
+        return true;
+    }
+	
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+        case R.id.about_menu_item:
+        	mostraDialogoSobre();
+            return true;
+        default:
+            return super.onOptionsItemSelected(item);
+        }
+    }
+    
+    public void mostraDialogoSobre(){
+    	  final TextView message = new TextView(this);
+    	  final SpannableString s = new SpannableString(this.getText(R.string.txt_sobre));
+    	  Linkify.addLinks(s, Linkify.WEB_URLS);
+    	  message.setText(s);
+    	  message.setMovementMethod(LinkMovementMethod.getInstance());
+
+    	  AlertDialog about = new AlertDialog.Builder(this)
+    	  	.setTitle(R.string.app_name)
+    	  	.setIcon(android.R.drawable.ic_dialog_info)
+    	  	.setPositiveButton(this.getString(android.R.string.ok), null)
+    	  	.setNeutralButton("Deixe sua opinião!", new DialogInterface.OnClickListener() {
+    	  		public void onClick(DialogInterface dialog, int id) {
+    	  			Intent intent = new Intent(Intent.ACTION_VIEW);
+    	  			intent.setData(Uri.parse("market://details?id=net.multassociais.mobile"));
+    	  			startActivity(intent);
+             }
+    	  	})
+    	  	.setView(message)
+    	  	.create();
+    	  about.show();
+      }
+    
 	private void showToast(String string) {
 		Toast feedback;
 		feedback = Toast.makeText(MultasSociaisActivity.this, string, Toast.LENGTH_SHORT);
