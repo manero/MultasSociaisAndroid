@@ -1,3 +1,7 @@
+We are live! https://play.google.com/store/apps/details?id=net.multassociais.mobile (http://bit.ly/MultasSociaisAndroid)
+
+Download, use, teste, mande feedback!
+
 Multas Sociais, App para Android
 
 Este é o app do site multassociais.net para dispositivos Android. Atualmente feito para dispositivos 2.2+, usando API Android level 8.
@@ -7,7 +11,8 @@ Este app ainda está bem cru, em fase de desenvolvimento. Há muito trabalho a ser
 Segue uma lista rápida do que fazer:
 
 - Criar e implementar uma identidade visual para o app,
-- Envio de geo coordenadas de latitude e longitude
+- Melhorar a UX
+- Envio de geo coordenadas de latitude e longitude (ainda não implementado no servidor)
 
 
 
@@ -23,4 +28,5 @@ This is the multassociais.net app for Android devices. Currently targeted toward
 This is still a very crude app with lots of work to be done. Here's a quick to do list:
 
 - Create and apply visual identity for the app,
-- Upload geo coordinates (latitude and longitude)
+- Better UX
+- Upload geo coordinates (latitude and longitude), NYI server side
