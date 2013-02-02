@@ -41,6 +41,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -51,6 +52,7 @@ public class MultasSociaisActivity extends Activity {
 	private static final int TAKE_PICTURE_REQUEST_CODE = 666; // \,,/
 	private static final int ACTIVITY_SELECT_IMAGE = 777;
 	private String imageFilePath;
+    private Button mBtListaMultas ;
 
 	/** Called when the activity is first created. */
 	@Override
@@ -59,7 +61,7 @@ public class MultasSociaisActivity extends Activity {
 		setContentView(R.layout.main);
 		imageFilePath = "";
 	}
-
+	
 	@Override
 	public void onActivityResult(int requestCode, int resultCode, Intent data) {
 		super.onActivityResult(requestCode, resultCode, data);
@@ -120,6 +122,11 @@ public class MultasSociaisActivity extends Activity {
 	public void selecionaFotoDaGaleria(View view) {
 		Intent i = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
 		startActivityForResult(i, ACTIVITY_SELECT_IMAGE); 
+	}
+	
+	public void listaMultas(View view) {
+	    Intent startListaMulta = new Intent(this, ListaMultasActivity.class);
+	    startActivity(startListaMulta);
 	}
 
 	// TODO: catch exception
@@ -224,7 +231,7 @@ public class MultasSociaisActivity extends Activity {
 		FileOutputStream newFile = new FileOutputStream(imageFile);
 		result.compress(Bitmap.CompressFormat.JPEG, 85, newFile);
 	}
-
+	
 	private class WebServiceCallTask extends AsyncTask<MultipartEntity, Void, Integer> {
 		ProgressDialog dialog;
 		

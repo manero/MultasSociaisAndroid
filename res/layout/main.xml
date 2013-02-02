@@ -93,6 +93,13 @@
                 android:layout_height="wrap_content"
                 android:onClick="enviaMulta"
                 android:text="@string/btn_multar" />
+            
+            <Button
+                android:id="@+id/bt_lista_multas"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:onClick="listaMultas"
+                android:text="@string/listar_multas" />
         </LinearLayout>
     </LinearLayout>
 
