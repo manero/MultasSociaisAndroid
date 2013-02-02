@@ -1,7 +1,7 @@
 package net.multassociais.mobile.views;
 
-import net.multassociais.mobile.models.Multa;
-import net.multassociais.mobile.models.Multa.MultasCollection;
+import net.multassociais.mobile.modelos.Multa;
+import net.multassociais.mobile.modelos.Multa.MultasCollection;
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
