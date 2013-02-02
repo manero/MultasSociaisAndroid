@@ -6,7 +6,7 @@ import net.multassociais.mobile.modelos.Multa.MultasCollection;
 import net.multassociais.mobile.views.MultasAdapter;
 import android.app.Activity;
 import android.os.Bundle;
-import android.widget.ListView;
+import android.widget.GridView;
 
 public class ListaMultasActivity extends Activity implements MultasListener {
 
@@ -25,7 +25,7 @@ public class ListaMultasActivity extends Activity implements MultasListener {
 
     private void listaMultas(MultasCollection multas) {
         MultasAdapter multasAdapter = new MultasAdapter(getBaseContext(), multas);
-        ((ListView) findViewById(R.id.lista_multas)).setAdapter(multasAdapter);
+        ((GridView) findViewById(R.id.lista_multas)).setAdapter(multasAdapter);
     }
     
     private void pegaMultas() {
