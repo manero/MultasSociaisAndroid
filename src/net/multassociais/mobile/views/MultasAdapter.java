@@ -1,7 +1,7 @@
 package net.multassociais.mobile.views;
 
-import java.util.List;
-
+import net.multassociais.mobile.models.Multa;
+import net.multassociais.mobile.models.Multa.MultasCollection;
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -9,11 +9,11 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
-public class MultasAdapter extends ArrayAdapter<String> {
+public class MultasAdapter extends ArrayAdapter<Multa> {
     
     private LayoutInflater mInflater;
 
-    public MultasAdapter(Context context, List<String> objects) {
+    public MultasAdapter(Context context, MultasCollection objects) {
         super(context, android.R.layout.simple_list_item_1, objects);
         mInflater = LayoutInflater.from(getContext());
     }
@@ -25,7 +25,7 @@ public class MultasAdapter extends ArrayAdapter<String> {
             rowView = (TextView) mInflater.inflate(android.R.layout.simple_list_item_1, parent, false);
         }
         
-        rowView.setText(getItem(position));
+        rowView.setText(getItem(position).getTitle());
         
         return rowView;
     }

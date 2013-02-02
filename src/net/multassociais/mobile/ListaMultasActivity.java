@@ -1,8 +1,9 @@
 package net.multassociais.mobile;
 
-import java.util.ArrayList;
 import java.util.Random;
 
+import net.multassociais.mobile.models.Multa;
+import net.multassociais.mobile.models.Multa.MultasCollection;
 import net.multassociais.mobile.views.MultasAdapter;
 import android.app.Activity;
 import android.os.Bundle;
@@ -23,16 +24,16 @@ public class ListaMultasActivity extends Activity {
         listaMultas(pegaMultas());
     }
 
-    private void listaMultas(ArrayList<String> multas) {
+    private void listaMultas(MultasCollection multas) {
         MultasAdapter multasAdapter = new MultasAdapter(getBaseContext(), multas);
         ((ListView) findViewById(R.id.lista_multas)).setAdapter(multasAdapter);
     }
     
-    private ArrayList<String> pegaMultas() {
-        ArrayList<String> itens = new ArrayList<String>();
+    private MultasCollection pegaMultas() {
+        MultasCollection itens = new MultasCollection();
         
         for (int i = 0; i < new Random().nextInt(50); i ++) {
-            itens.add("Item " + i + " // " + new Random().nextInt(100));
+            itens.add(new Multa("Item " + i + " // " + new Random().nextInt(100)));
         }
         
         return itens;
