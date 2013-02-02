@@ -15,4 +15,6 @@ O Multas Sociais não se responsabiliza pelo conteúdo das informações, imagen
 Entre em contato através do e-mail contato@multassociais.net.\n\n
 Caso queira colaborar com o desenvolvimento do app, visite http://bit.ly/MultasSociaisAndroidGithub ou deixe sua opinião/sugestão clicando no botão abaixo!</string>
 	<string name="listar_multas">Listar Multas</string>
+	
+	<string name="list_multas_title">Mostrando 10 multas mais recentes</string>
 </resources>
