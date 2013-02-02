@@ -1,15 +1,14 @@
 package net.multassociais.mobile;
 
-import java.util.Random;
-
-import net.multassociais.mobile.models.Multa;
-import net.multassociais.mobile.models.Multa.MultasCollection;
+import net.multassociais.mobile.comunicacoes.RequisitaMultasTask;
+import net.multassociais.mobile.comunicacoes.RequisitaMultasTask.MultasListener;
+import net.multassociais.mobile.modelos.Multa.MultasCollection;
 import net.multassociais.mobile.views.MultasAdapter;
 import android.app.Activity;
 import android.os.Bundle;
 import android.widget.ListView;
 
-public class ListaMultasActivity extends Activity {
+public class ListaMultasActivity extends Activity implements MultasListener {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -21,7 +20,7 @@ public class ListaMultasActivity extends Activity {
     protected void onStart() {
         super.onStart();
         
-        listaMultas(pegaMultas());
+        pegaMultas();
     }
 
     private void listaMultas(MultasCollection multas) {
@@ -29,13 +28,13 @@ public class ListaMultasActivity extends Activity {
         ((ListView) findViewById(R.id.lista_multas)).setAdapter(multasAdapter);
     }
     
-    private MultasCollection pegaMultas() {
-        MultasCollection itens = new MultasCollection();
-        
-        for (int i = 0; i < new Random().nextInt(50); i ++) {
-            itens.add(new Multa("Item " + i + " // " + new Random().nextInt(100)));
-        }
-        
-        return itens;
+    private void pegaMultas() {
+        RequisitaMultasTask requerente = new RequisitaMultasTask(this, this);
+        requerente.execute((Void[])null);
+    }
+
+    @Override
+    public void onMultasLoaded(MultasCollection multas) {
+        listaMultas(multas);
     }
 }
