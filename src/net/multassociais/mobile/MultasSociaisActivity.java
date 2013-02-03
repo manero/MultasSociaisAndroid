@@ -8,21 +8,15 @@ import java.nio.charset.Charset;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-import org.apache.http.HttpResponse;
-import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpPost;
+import net.multassociais.mobile.comunicacoes.EnviaMultaTask;
+
 import org.apache.http.entity.mime.HttpMultipartMode;
 import org.apache.http.entity.mime.MultipartEntity;
 import org.apache.http.entity.mime.content.FileBody;
 import org.apache.http.entity.mime.content.StringBody;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.protocol.BasicHttpContext;
-import org.apache.http.protocol.HttpContext;
 
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
@@ -30,7 +24,6 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.BitmapFactory.Options;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
@@ -41,6 +34,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -51,6 +45,7 @@ public class MultasSociaisActivity extends Activity {
 	private static final int TAKE_PICTURE_REQUEST_CODE = 666; // \,,/
 	private static final int ACTIVITY_SELECT_IMAGE = 777;
 	private String imageFilePath;
+    private Button mBtListaMultas ;
 
 	/** Called when the activity is first created. */
 	@Override
@@ -59,7 +54,7 @@ public class MultasSociaisActivity extends Activity {
 		setContentView(R.layout.main);
 		imageFilePath = "";
 	}
-
+	
 	@Override
 	public void onActivityResult(int requestCode, int resultCode, Intent data) {
 		super.onActivityResult(requestCode, resultCode, data);
@@ -121,6 +116,11 @@ public class MultasSociaisActivity extends Activity {
 		Intent i = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
 		startActivityForResult(i, ACTIVITY_SELECT_IMAGE); 
 	}
+	
+	public void listaMultas(View view) {
+	    Intent startListaMulta = new Intent(this, ListaMultasActivity.class);
+	    startActivity(startListaMulta);
+	}
 
 	// TODO: catch exception
 	public void enviaMulta(View view) throws IOException {
@@ -158,7 +158,7 @@ public class MultasSociaisActivity extends Activity {
 		entity.addPart("multa[video]", new StringBody(""));
 		entity.addPart("multa[descricao]", new StringBody(descricao, Charset.forName("UTF-8")));
 
-		WebServiceCallTask task = new WebServiceCallTask();
+		EnviaMultaTask task = new EnviaMultaTask(this);
 		task.execute(entity);
 	}
 	
@@ -223,62 +223,6 @@ public class MultasSociaisActivity extends Activity {
 		Bitmap result = BitmapFactory.decodeFile(imageFile.getAbsolutePath(), opt);
 		FileOutputStream newFile = new FileOutputStream(imageFile);
 		result.compress(Bitmap.CompressFormat.JPEG, 85, newFile);
-	}
-
-	private class WebServiceCallTask extends AsyncTask<MultipartEntity, Void, Integer> {
-		ProgressDialog dialog;
-		
-		@Override
-		protected void onPreExecute() {
-			dialog = new ProgressDialog(MultasSociaisActivity.this);
-			
-			super.onPreExecute();
-			dialog.setMessage("Enviando...");
-			dialog.show();
-		}
-
-		@Override
-		protected Integer doInBackground(MultipartEntity... entity) {
-			HttpClient httpClient = new DefaultHttpClient();
-			HttpContext localContext = new BasicHttpContext();
-			HttpPost httpPost = new HttpPost("http://testes.multassociais.net/api");
-
-			httpPost.setEntity(entity[0]);
-			HttpResponse response;
-			try {
-				response = httpClient.execute(httpPost, localContext);
-				int statusCode = response.getStatusLine().getStatusCode();
-				return statusCode;
-				
-			} catch (ClientProtocolException e) {
-				showToast("Falhou");
-				cancel(true);
-				return null;
-			} catch (IOException e) {
-				showToast("Falhou");
-				cancel(true);
-				return null;
-			}
-		}
-		
-		@Override
-		protected void onCancelled() {
-			dialog.dismiss();
-			super.onCancelled();
-		}
-		
-		@Override
-		protected void onPostExecute(Integer statusCode) {
-			super.onPostExecute(statusCode);
-			
-			if (statusCode >= 200 && statusCode < 300) {
-				showToast("Sucesso");
-			}
-			else {
-				showToast("Falhou!");
-			}
-			dialog.dismiss();
-		}
 	}
 
 }
